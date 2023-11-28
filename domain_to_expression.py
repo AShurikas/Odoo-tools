@@ -29,7 +29,7 @@ def find_and_replace_attrs(xml_file_path):
                 # Delete deprecated attribute
                 del elem.attrib['attrs']
         # Save modified attrs
-        tree.write(xml_file_path)
+        tree.write(xml_file_path, encoding='utf-8', xml_declaration=True)
     except ET.ParseError:
         _logger.error("Error parse file %s", xml_file_path)
 
