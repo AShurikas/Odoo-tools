@@ -12,8 +12,7 @@ OPERATORS_MAPPING = {
 }
 
 
-def find_and_print_attrs(xml_file_path):
-    modified_attrs = {}
+def find_and_replace_attrs(xml_file_path):
     try:
         tree = ET.parse(xml_file_path)
         root = tree.getroot()
@@ -29,15 +28,10 @@ def find_and_print_attrs(xml_file_path):
                     elem.attrib[attribute] = attributes[attribute]
                 # Delete deprecated attribute
                 del elem.attrib['attrs']
-
-                # Save modified attrs
-                modified_attrs[xml_file_path] = attributes
-        try:
-            tree.write(xml_file_path)
-        except:
-            _logger.error("Failed to write tree in file %s" % xml_file_path)
+        # Save modified attrs
+        tree.write(xml_file_path, encoding='utf-8', xml_declaration=True)
     except ET.ParseError:
-        pass
+        _logger.error("Error parse file %s", xml_file_path)
 
 
 def parse_attributes(attributes, xml_file_path):
@@ -73,15 +67,11 @@ def get_expression(domain, xml_file_path):
 
 
 def search_in_folders(root_folder):
-    attrs = {}
     for foldername, subfolders, filenames in os.walk(root_folder):
         for filename in filenames:
             if filename.endswith('.xml'):
                 file_path = os.path.join(foldername, filename)
-                xml_attrs = find_and_print_attrs(file_path)
-                if xml_attrs:
-                    attrs.update(xml_attrs)
-    return attrs
+                find_and_replace_attrs(file_path)
 
-attrs = search_in_folders('%s/crnd-inc/generic-addons' % os.path.dirname(
-    os.getcwd()))
+
+search_in_folders('%s/crnd-inc/generic-addons' % os.path.dirname(os.getcwd()))
