@@ -47,7 +47,8 @@ def parse_attributes(attributes, xml_file_path):
             attributes[attribute] = str(int(attributes[attribute]))
         elif isinstance(attributes[attribute], list):
             expession = get_expression(attributes[attribute], xml_file_path)
-            attributes[attribute] = expession
+            if expession:
+                attributes[attribute] = expession
         else:
             _logger.info('Undefined expression %s in %s' % (
                 attributes[attribute],
@@ -57,14 +58,18 @@ def parse_attributes(attributes, xml_file_path):
 
 
 def get_expression(domain, xml_file_path):
-    expression = ""
-    for expr in domain:
-        expression += '%s %s %s' % (
-            expr[0],
-            OPERATORS_MAPPING.get(expr[1]),
-            repr(expr[2]))
-    print(domain, '->>>>>', expression)
-    return expression
+    if len(domain) == 1:
+        expression = ""
+        for expr in domain:
+            expression += '%s %s %s' % (
+                expr[0],
+                OPERATORS_MAPPING.get(expr[1]),
+                repr(expr[2]))
+        print(domain, '->>>>>', expression)
+        return expression
+    print('There is multiple domain %s in path %s. Passed.' % (
+        domain, xml_file_path))
+    return False
 
 
 def search_in_folders(root_folder):
@@ -80,4 +85,3 @@ def search_in_folders(root_folder):
 
 attrs = search_in_folders('%s/crnd-inc/generic-addons' % os.path.dirname(
     os.getcwd()))
-print(attrs)
