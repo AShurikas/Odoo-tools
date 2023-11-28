@@ -19,10 +19,12 @@ def find_and_print_attrs(xml_file_path):
         root = tree.getroot()
 
         for elem in root.iter():
+            # Check if element has attrs in attributes
             if 'attrs' in elem.attrib and elem.attrib['attrs']:
-                # Parse elem.attrib['attrs'] to get new attributes
+                # Parse attrs to split them on separate attributes
+                # and evaluate expression of them
                 attributes = parse_attributes(elem.attrib['attrs'], xml_file_path)
-                # Add new attributes readonly="True"
+                # Add separate attributes
                 for attribute in attributes:
                     elem.attrib[attribute] = attributes[attribute]
                 # Delete deprecated attribute
@@ -36,7 +38,6 @@ def find_and_print_attrs(xml_file_path):
             _logger.error("Failed to write tree in file %s" % xml_file_path)
     except ET.ParseError:
         pass
-    return modified_attrs
 
 
 def parse_attributes(attributes, xml_file_path):
@@ -56,18 +57,15 @@ def parse_attributes(attributes, xml_file_path):
 
 
 def get_expression(domain, xml_file_path):
-    try:
-        expression = ""
-        # assert len(domain) == 3, 'domain %s in file %s is not valid' % (domain, xml_file_path)
-        for expr in domain:
-            expression += '%s %s %s' % (
-                expr[0],
-                OPERATORS_MAPPING.get(expr[1]),
-                repr(expr[2]))
-        print(domain, '->>>>>', expression)
-    except Exception:
-        _logger.info('Domain lenght is not valid %s' % domain)
+    expression = ""
+    for expr in domain:
+        expression += '%s %s %s' % (
+            expr[0],
+            OPERATORS_MAPPING.get(expr[1]),
+            repr(expr[2]))
+    print(domain, '->>>>>', expression)
     return expression
+
 
 def search_in_folders(root_folder):
     attrs = {}
